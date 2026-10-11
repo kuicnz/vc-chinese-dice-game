@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="system">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fff8e7" />
+    <meta name="description" content="把手机变成你的随身骰盅。五颗骰子，一桌朋友，随时开局。" />
+    <title>口袋骰盅 · Pocket Dice</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23ffcd50' stroke='%23272b37' stroke-width='3' d='M3 3h26v26H3z'/%3E%3Cpath fill='%23272b37' d='M8 8h5v5H8zm11 0h5v5h-5zm-6 6h6v5h-6zm-5 6h5v5H8zm11 0h5v5h-5z'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+    <div class="ambient ambient-three" aria-hidden="true"></div>
+
+    <div class="app-shell" data-state="ready">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 28 28"><path d="M3 3h22v22H3z" fill="currentColor"/><path d="M7 7h4v4H7zm10 0h4v4h-4zm-5 5h4v4h-4zm-5 5h4v4H7zm10 0h4v4h-4z" fill="var(--gold, #ffcd50)"/></svg>
+          </span>
+          <div class="brand-copy"><strong data-i18n="brand">口袋骰盅</strong><span>POCKET DICE CLUB</span></div>
+        </div>
+        <div class="toolbar">
+          <button class="icon-button" id="theme-toggle" type="button" aria-label="主题：跟随系统，点击切换" title="主题：跟随系统，点击切换">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v12H4zM8 20h8M12 16v4"/></svg>
+          </button>
+          <button class="icon-button" id="language-toggle" type="button" aria-label="Switch to English" title="Switch to English">EN</button>
+        </div>
+      </header>
+
+      <section class="scoreboard" aria-label="本局与战绩" id="scoreboard">
+        <div class="round-stat"><span class="stat-label" data-i18n="round">当前局数</span><strong id="round-count">01</strong></div>
+        <div class="score-items">
+          <div class="stat stat-win"><span class="stat-label"><i aria-hidden="true"></i><span data-i18n="win">赢</span></span><strong id="win-count">00</strong></div>
+          <div class="stat stat-draw"><span class="stat-label"><i aria-hidden="true"></i><span data-i18n="draw">平</span></span><strong id="draw-count">00</strong></div>
+          <div class="stat stat-loss"><span class="stat-label"><i aria-hidden="true"></i><span data-i18n="loss">输</span></span><strong id="loss-count">00</strong></div>
+        </div>
+      </section>
+
+      <main class="play-area">
+        <div class="intro">
+          <div class="eyebrow"><span class="live-dot" aria-hidden="true"></span><span data-i18n="eyebrow">朋友到齐，随时开局</span></div>
+          <h1 id="headline">好手气，摇出来。</h1>
+          <p id="subtitle">五颗骰子，一桌朋友。今晚看你的！</p>
+        </div>
+
+        <section class="dice-arena" id="dice-arena" data-state="ready" aria-label="五颗骰子">
+          <div class="arena-topline">
+            <span class="arena-label"><span aria-hidden="true">✦</span> <span data-i18n="arena">你的专属骰盅</span></span>
+            <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="true" aria-label="音效已开启">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM17 8c2 2 2 6 0 8M20 5c4 4 4 10 0 14"/></svg>
+              <span id="sound-label">音效开</span>
+            </button>
+          </div>
+
+          <div class="dice-scene">
+            <span class="pixel-spark spark-one" aria-hidden="true"></span>
+            <span class="pixel-spark spark-two" aria-hidden="true"></span>
+            <span class="pixel-spark spark-three" aria-hidden="true"></span>
+            <div class="dice-group" id="dice-group" role="group" aria-label="骰子点数"></div>
+          </div>
+
+          <div class="arena-bottomline">
+            <span class="status-badge" id="status-badge"><span class="status-dot" aria-hidden="true"></span><span id="status-text">准备就绪</span></span>
+            <span id="dice-caption">5 颗骰子 · 无限手气</span>
+          </div>
+        </section>
+
+        <div class="controls">
+          <div id="ready-controls" class="control-group">
+            <button id="shake-button" class="action-button action-primary" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m8 4 12 4-4 12-12-4zM2 6V2h4M18 22h4v-4"/><path d="M10 8h2v2h-2zm3 6h2v2h-2z" fill="currentColor" stroke="none"/></svg>
+              <span id="shake-label">摇晃</span><span class="button-arrow" aria-hidden="true">↗</span>
+            </button>
+          </div>
+          <div id="result-controls" class="control-group split-controls" hidden>
+            <button id="reroll-button" class="action-button action-secondary" type="button"><span aria-hidden="true">↻</span><span data-i18n="reroll">重摇</span></button>
+            <button id="confirm-button" class="action-button action-primary" type="button"><span data-i18n="confirm">确定</span><span aria-hidden="true">✓</span></button>
+          </div>
+          <div id="locked-controls" class="control-group" hidden>
+            <fieldset class="outcome-picker">
+              <legend class="sr-only" data-i18n="outcome">选择本局结果</legend>
+              <label class="outcome-option win"><input type="radio" name="outcome" value="win" /><span class="outcome-content"><span class="outcome-icon" aria-hidden="true">✓</span><span data-i18n="win">赢</span></span></label>
+              <label class="outcome-option draw"><input type="radio" name="outcome" value="draw" checked /><span class="outcome-content"><span class="outcome-icon" aria-hidden="true">−</span><span data-i18n="draw">平</span></span></label>
+              <label class="outcome-option loss"><input type="radio" name="outcome" value="loss" /><span class="outcome-content"><span class="outcome-icon" aria-hidden="true">×</span><span data-i18n="loss">输</span></span></label>
+            </fieldset>
+            <div class="round-slider" id="round-slider" style="--slide-x: 0px; --slide-progress: 0">
+              <span class="slider-track-fill" id="slider-fill" aria-hidden="true"></span>
+              <span class="slider-label" id="slider-label" data-i18n="slide">滑动结束本局</span>
+              <button class="slider-thumb" id="slider-thumb" type="button" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="滑动结束本局" aria-describedby="slider-instructions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m10 5 7 7-7 7M3 12h14"/></svg>
+              </button>
+            </div>
+            <span class="sr-only" id="slider-instructions" data-i18n="sliderHelp">向右拖动到底，或用方向键调整并按 End 键完成结算。</span>
+          </div>
+          <p class="control-hint" id="hint">点击摇晃，让好运开始转动</p>
+        </div>
+      </main>
+
+      <footer class="footer-note"><span class="footer-diamonds" aria-hidden="true"><i></i><i></i><i></i></span><span data-i18n="footer">小小骰盅，大大快乐。</span></footer>
+      <div class="sr-only" role="status" aria-live="polite" id="announcement"></div>
+    </div>
+  </body>
+</html>
