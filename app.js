@@ -14,6 +14,9 @@
       scoreboard: '本局与战绩', dice: '五颗骰子', die: '骰子', points: '点',
       caption: '5 颗骰子 · 无限手气', resultCaption: '记住点数，藏好好运', done: '本局已结束 ✓',
       nextRound: '本局已记分，新一局开始。',
+      reset: '重置记录', resetTitle: '确定重置记录？', cancel: '取消', resetConfirm: '确认重置',
+      resetDescription: '局数和赢、平、输记录将清零，当前对局也会重新开始。主题、语言和音效设置会保留，此操作无法撤销。',
+      resetDone: '记录已清空，从第 1 局重新开始。',
       ready: { title: '好手气，摇出来。', subtitle: '五颗骰子，一桌朋友。今晚看你的！', status: '准备就绪', hint: '点击摇晃，让好运开始转动' },
       shaking: { title: '好运，正在路上！', subtitle: '跟着感觉走，随时喊停。', status: '摇晃中', hint: '点击「停」，揭晓你的点数' },
       result: { title: '这把，手气如何？', subtitle: '不满意就重摇，准备好了就确定。', status: '等待确认', hint: '确定后锁定点数，和朋友开始对局' },
@@ -30,6 +33,9 @@
       scoreboard: 'Round and results', dice: 'Five dice', die: 'Die', points: '',
       caption: '5 DICE · ENDLESS LUCK', resultCaption: 'YOUR DICE, YOUR SECRET', done: 'Round complete ✓',
       nextRound: 'Result saved. A new round is ready.',
+      reset: 'Reset records', resetTitle: 'Reset your records?', cancel: 'Cancel', resetConfirm: 'Reset records',
+      resetDescription: 'Clear all round, win, draw and loss records and restart the current round. Theme, language and sound settings will stay. This cannot be undone.',
+      resetDone: 'Records cleared. Starting again at round 1.',
       ready: { title: 'Give luck a little shake.', subtitle: 'Five dice. A table of friends. Your move.', status: 'READY TO ROLL', hint: 'Tap Shake and let the good times roll' },
       shaking: { title: 'Good luck in motion.', subtitle: 'Trust your gut. Stop when it feels right.', status: 'SHAKING', hint: 'Tap Stop to reveal your dice' },
       result: { title: 'Feeling lucky?', subtitle: 'Roll again, or lock in your lucky five.', status: 'YOUR CALL', hint: 'Confirm your dice to start playing with friends' },
@@ -42,6 +48,7 @@
   const arena = $('#dice-arena');
   const slider = $('#round-slider');
   const thumb = $('#slider-thumb');
+  const resetDialog = $('#reset-dialog');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const systemTheme = matchMedia('(prefers-color-scheme: dark)');
   const faces = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
@@ -63,6 +70,7 @@
   let slideProgress = 0;
   let drag = null;
   let finishing = false;
+  let finishTimer = 0;
   const activeSounds = new Set();
 
   const diceElements = Array.from({ length: 5 }, (_, i) => {
@@ -160,6 +168,8 @@
     $('#language-toggle').textContent = language === 'zh' ? 'EN' : '中';
     $('#language-toggle').setAttribute('aria-label', language === 'zh' ? 'Switch to English' : '切换为中文');
     $('#language-toggle').title = $('#language-toggle').getAttribute('aria-label');
+    $('#reset-records-button').setAttribute('aria-label', text.reset);
+    $('#reset-records-button').title = text.reset;
     updateTheme();
     updateSound();
     drawDice();
@@ -321,7 +331,8 @@
     ensureAudio();
     melody(outcome);
     const finalOutcome = outcome;
-    window.setTimeout(() => {
+    finishTimer = window.setTimeout(() => {
+      finishTimer = 0;
       stats[finalOutcome] += 1;
       outcome = 'draw';
       state = 'ready';
@@ -333,9 +344,49 @@
       void shell.offsetWidth;
       shell.classList.add('celebration');
       $('#announcement').textContent = words[language].nextRound;
-      $('#shake-button').focus({ preventScroll: true });
+      if (!resetDialog.open) $('#shake-button').focus({ preventScroll: true });
     }, reducedMotion.matches ? 0 : 220);
   }
+
+  function resetRecords() {
+    clearTimeout(finishTimer);
+    finishTimer = 0;
+    cancelAnimationFrame(animationFrame);
+    stopSounds();
+    finishing = false;
+    stats.win = stats.draw = stats.loss = 0;
+    dice = [3, 1, 5, 4, 2];
+    outcome = 'draw';
+    state = 'ready';
+    arena.classList.remove('is-settling');
+    shell.classList.remove('celebration');
+    diceElements.forEach((die) => {
+      die.style.setProperty('--shake-x', '0px');
+      die.style.setProperty('--shake-y', '0px');
+      die.style.setProperty('--shake-r', '0deg');
+    });
+    render();
+    resetSlider();
+    save();
+    $('#announcement').textContent = words[language].resetDone;
+  }
+
+  $('#reset-records-button').addEventListener('click', () => {
+    if (resetDialog.open) return;
+    cancelAnimationFrame(animationFrame);
+    stopSounds();
+    resetDialog.returnValue = 'cancel';
+    resetDialog.showModal();
+  });
+  resetDialog.addEventListener('close', () => {
+    if (resetDialog.returnValue === 'confirm') resetRecords();
+    else if (state === 'shaking' && !document.hidden) {
+      ensureAudio();
+      lastShake = -Infinity;
+      animationFrame = requestAnimationFrame(shakeFrame);
+    }
+    $('#reset-records-button').focus({ preventScroll: true });
+  });
 
   $('#shake-button').addEventListener('click', () => state === 'shaking' ? stopShake() : startShake());
   $('#reroll-button').addEventListener('click', startShake);

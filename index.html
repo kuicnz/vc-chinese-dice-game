@@ -24,6 +24,9 @@
           <div class="brand-copy"><strong data-i18n="brand">口袋骰盅</strong><span>POCKET DICE CLUB</span></div>
         </div>
         <div class="toolbar">
+          <button class="icon-button" id="reset-records-button" type="button" aria-label="重置记录" title="重置记录" aria-haspopup="dialog" aria-controls="reset-dialog">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7"/></svg>
+          </button>
           <button class="icon-button" id="theme-toggle" type="button" aria-label="主题：跟随系统，点击切换" title="主题：跟随系统，点击切换">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v12H4zM8 20h8M12 16v4"/></svg>
           </button>
@@ -103,5 +106,16 @@
       <footer class="footer-note"><span class="footer-diamonds" aria-hidden="true"><i></i><i></i><i></i></span><span data-i18n="footer">小小骰盅，大大快乐。</span></footer>
       <div class="sr-only" role="status" aria-live="polite" id="announcement"></div>
     </div>
+    <dialog class="reset-dialog" id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-description">
+      <form method="dialog">
+        <span class="dialog-symbol" aria-hidden="true">!</span>
+        <h2 id="reset-title" data-i18n="resetTitle">确定重置记录？</h2>
+        <p id="reset-description" data-i18n="resetDescription">局数和赢、平、输记录将清零，当前对局也会重新开始。主题、语言和音效设置会保留，此操作无法撤销。</p>
+        <div class="dialog-actions">
+          <button class="action-button action-secondary" type="submit" value="cancel" autofocus data-i18n="cancel">取消</button>
+          <button class="action-button action-reset" id="confirm-reset-button" type="submit" value="confirm" data-i18n="resetConfirm">确认重置</button>
+        </div>
+      </form>
+    </dialog>
   </body>
 </html>
